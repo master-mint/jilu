@@ -543,13 +543,14 @@ import {
     return `${date.getMonth() + 1}.${date.getDate()}`;
   }
 
-  function chartLabels(series, base) {
+  function chartLabels(series, base, left, right) {
     const middle = series[Math.floor(series.length / 2)];
     const last = series.at(-1);
     return `
-      <text class="chart-axis-label" x="28" y="${base + 20}">${shortDateLabel(series[0].key)}</text>
+      <text class="chart-axis-label" x="${left}" y="${base + 20}">${shortDateLabel(series[0].key)}</text>
       <text class="chart-axis-label" x="210" y="${base + 20}" text-anchor="middle">${shortDateLabel(middle.key)}</text>
-      <text class="chart-axis-label" x="392" y="${base + 20}" text-anchor="end">${shortDateLabel(last.key)}</text>
+      <text class="chart-axis-label" x="${right}" y="${base + 20}" text-anchor="end">${shortDateLabel(last.key)}</text>
+      <text class="chart-axis-title" x="210" y="${base + 40}" text-anchor="middle">日期</text>
     `;
   }
 
@@ -570,41 +571,49 @@ import {
 
   function renderHairlineLineChart(container, series) {
     const width = 420;
-    const left = 28;
+    const left = 46;
     const right = 392;
-    const top = 28;
-    const base = 172;
+    const top = 32;
+    const base = 166;
     const max = Math.max(1, ...series.map((item) => item.value));
     const x = (index) => left + (series.length === 1 ? 0 : (index * (right - left)) / (series.length - 1));
     const y = (value) => base - ((base - top) * value) / max;
     const path = smoothChartPath(series, x, y);
 
     container.innerHTML = `
-      <svg viewBox="0 0 ${width} 212" role="img" aria-label="近三十天每日复习次数">
-        <line class="chart-baseline" x1="22" y1="${base}" x2="398" y2="${base}"></line>
+      <svg viewBox="0 0 ${width} 220" role="img" aria-label="近三十天每日复习次数，横轴为日期，纵轴为当天完成的复习次数">
+        <line class="chart-axis" x1="${left}" y1="${top}" x2="${left}" y2="${base}"></line>
+        <line class="chart-baseline" x1="${left}" y1="${base}" x2="${right}" y2="${base}"></line>
+        <text class="chart-axis-value" x="${left - 8}" y="${top + 4}" text-anchor="end">${max} 次</text>
+        <text class="chart-axis-value" x="${left - 8}" y="${base + 3}" text-anchor="end">0</text>
+        <text class="chart-axis-title" transform="translate(14 100) rotate(-90)" text-anchor="middle">复习次数</text>
         <path class="chart-hairline" d="${path}"></path>
         ${series.map((item, index) => `<circle class="chart-hover-target" cx="${x(index)}" cy="${y(item.value)}" r="10"><title>${shortDateLabel(item.key)}：${item.value} 次复习</title></circle>`).join("")}
-        ${chartLabels(series, base)}
+        ${chartLabels(series, base, left, right)}
       </svg>
     `;
   }
 
   function renderHairlineAreaChart(container, series) {
-    const left = 28;
+    const left = 46;
     const right = 392;
-    const top = 28;
-    const base = 172;
+    const top = 32;
+    const base = 166;
     const x = (index) => left + (series.length === 1 ? 0 : (index * (right - left)) / (series.length - 1));
     const y = (value) => base - ((base - top) * value) / 100;
     const path = smoothChartPath(series, x, y);
 
     container.innerHTML = `
-      <svg viewBox="0 0 420 212" role="img" aria-label="滚动七天记忆留存率">
-        <line class="chart-baseline" x1="22" y1="${base}" x2="398" y2="${base}"></line>
+      <svg viewBox="0 0 420 220" role="img" aria-label="滚动七天记忆留存率，横轴为日期，纵轴为七天滚动留存率">
+        <line class="chart-axis" x1="${left}" y1="${top}" x2="${left}" y2="${base}"></line>
+        <line class="chart-baseline" x1="${left}" y1="${base}" x2="${right}" y2="${base}"></line>
+        <text class="chart-axis-value" x="${left - 8}" y="${top + 4}" text-anchor="end">100%</text>
+        <text class="chart-axis-value" x="${left - 8}" y="${base + 3}" text-anchor="end">0%</text>
+        <text class="chart-axis-title" transform="translate(14 100) rotate(-90)" text-anchor="middle">留存率（%）</text>
         <path class="chart-area-fill" d="${path} L ${right} ${base} L ${left} ${base} Z"></path>
         <path class="chart-hairline" d="${path}"></path>
         ${series.map((item, index) => `<circle class="chart-hover-target" cx="${x(index)}" cy="${y(item.value)}" r="10"><title>${shortDateLabel(item.key)}：${item.value}%</title></circle>`).join("")}
-        ${chartLabels(series, base)}
+        ${chartLabels(series, base, left, right)}
       </svg>
     `;
   }
