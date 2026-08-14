@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0e7a6f" />
+    <title>记律 · 间隔复习</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%230e7a6f'/><path d='M20 22h24M20 32h24M20 42h16' stroke='white' stroke-width='5' stroke-linecap='round'/></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap"
+      rel="stylesheet" media="print" onload="this.media='all'"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app" class="app-shell">
+      <aside class="app-rail" aria-label="主导航">
+        <a class="brand" href="#" data-view="dashboard" aria-label="返回今日复习">
+          <span class="brand-mark" aria-hidden="true">
+            <span class="brand-mark-bar"></span>
+            <span class="brand-mark-bar"></span>
+            <span class="brand-mark-bar"></span>
+          </span>
+          <span class="brand-name">记律</span>
+        </a>
+
+        <nav class="topnav" aria-label="主导航">
+          <button class="nav-item is-active" type="button" data-view="dashboard">
+            <span class="nav-icon" data-icon="dashboard"></span>
+            <span>今日</span>
+          </button>
+          <button class="nav-item" type="button" data-view="library">
+            <span class="nav-icon" data-icon="library"></span>
+            <span>资料库</span>
+          </button>
+          <button class="nav-item" type="button" data-view="stats">
+            <span class="nav-icon" data-icon="chart"></span>
+            <span>统计</span>
+          </button>
+          <button class="nav-item" type="button" data-view="analysis">
+            <span class="nav-icon" data-icon="activity"></span>
+            <span>分析</span>
+          </button>
+          <button class="nav-item" type="button" data-view="settings">
+            <span class="nav-icon" data-icon="settings"></span>
+            <span>设置</span>
+          </button>
+        </nav>
+
+        <div class="topbar-actions">
+          <button class="primary-button compact" id="add-card-button" type="button">
+            <span data-icon="plus"></span>
+            <span class="button-label">添加</span>
+          </button>
+        </div>
+      </aside>
+
+      <section class="workspace">
+        <header class="workspace-header">
+          <div class="workspace-status">
+            <span id="workspace-greeting">你好</span>
+            <span id="workspace-companion-days">今天是你与记律同行的第 1 天</span>
+          </div>
+          <div class="workspace-actions">
+            <button class="icon-button" id="reminder-button" type="button" aria-label="提醒" data-tooltip="提醒">
+              <span data-icon="bell"></span>
+              <span class="notification-dot" hidden></span>
+            </button>
+            <button class="icon-button" id="theme-toggle" type="button" aria-label="切换主题" data-tooltip="切换主题">
+              <span data-icon="moon"></span>
+            </button>
+          </div>
+        </header>
+
+        <main class="main-content" id="main-content" tabindex="-1">
+        <section class="view is-active" id="view-dashboard" data-view-panel="dashboard">
+          <div class="dashboard-layout">
+            <article class="dashboard-hero focus-panel">
+              <div class="focus-copy">
+                <p class="eyebrow">今日复习</p>
+                <h1 id="focus-title">准备好开始了吗？</h1>
+                <p id="focus-subtitle" class="focus-subtitle">先添加一张卡片，系统会帮你安排节奏。</p>
+                <div class="focus-actions">
+                  <button class="primary-button large" id="start-review-button" type="button">
+                    <span data-icon="play"></span>
+                    <span>开始复习</span>
+                  </button>
+                  <button class="secondary-button large" id="quick-add-button" type="button">
+                    <span data-icon="plus"></span>
+                    <span>添加卡片</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="focus-visual dashboard-ledger" aria-label="学习进度概览">
+                <div class="progress-ring" id="today-progress-ring">
+                  <svg viewBox="0 0 120 120" aria-hidden="true">
+                    <circle class="ring-track" cx="60" cy="60" r="50"></circle>
+                    <circle class="ring-value" cx="60" cy="60" r="50"></circle>
+                  </svg>
+                  <div class="ring-center">
+                    <strong id="today-progress-value">0%</strong>
+                    <span>今日完成</span>
+                  </div>
+                </div>
+                <div class="memory-curve" aria-hidden="true">
+                  <span class="curve-label">记忆保持</span>
+                  <svg viewBox="0 0 320 88" preserveAspectRatio="none">
+                    <defs>
+                      <linearGradient id="curve-fill" x1="0" x2="0" y1="0" y2="1">
+                        <stop offset="0%" stop-color="var(--color-accent)" stop-opacity="0.24"></stop>
+                        <stop offset="100%" stop-color="var(--color-accent)" stop-opacity="0"></stop>
+                      </linearGradient>
+                    </defs>
+                    <path class="curve-area" d="M0,78 C45,72 58,22 108,32 S190,76 240,26 S286,18 320,12 L320,88 L0,88 Z"></path>
+                    <path class="curve-line" d="M0,78 C45,72 58,22 108,32 S190,76 240,26 S286,18 320,12"></path>
+                  </svg>
+                </div>
+              </div>
+            </article>
+
+            <section class="dashboard-metrics metric-grid" aria-label="学习数据概览">
+              <article class="metric-card">
+                <span class="metric-icon" data-icon="target"></span>
+                <span class="metric-label">待复习</span>
+                <strong id="due-count" class="metric-value">0</strong>
+              </article>
+              <article class="metric-card">
+                <span class="metric-icon" data-icon="layers"></span>
+                <span class="metric-label">新卡片</span>
+                <strong id="new-count" class="metric-value">0</strong>
+              </article>
+              <article class="metric-card">
+                <span class="metric-icon" data-icon="sparkline"></span>
+                <span class="metric-label">今日完成</span>
+                <strong id="today-completed-count" class="metric-value">0%</strong>
+              </article>
+              <article class="metric-card">
+                <span class="metric-icon" data-icon="gauge"></span>
+                <span class="metric-label">今日学习次数</span>
+                <strong id="today-review-count" class="metric-value">0</strong>
+              </article>
+            </section>
+
+            <section class="dashboard-insights dashboard-columns">
+              <article class="panel">
+                <div class="panel-header">
+                  <div>
+                    <p class="eyebrow">接下来</p>
+                    <h2>待复习卡片</h2>
+                  </div>
+                  <button class="text-button" type="button" data-view="library">查看全部</button>
+                </div>
+                <div id="upcoming-list" class="card-list empty-hint">暂无需要复习的卡片。</div>
+              </article>
+
+            </section>
+          </div>
+        </section>
+
+        <section class="view" id="view-library" data-view-panel="library">
+          <div class="view-header">
+            <div>
+              <p class="eyebrow">资料库</p>
+              <h1>我的卡片</h1>
+              <p id="library-summary" class="view-description">0 张卡片</p>
+            </div>
+            <button class="primary-button" id="library-add-button" type="button">
+              <span data-icon="plus"></span>
+              <span>添加卡片</span>
+            </button>
+          </div>
+
+          <div class="toolbar">
+            <label class="search-box">
+              <span data-icon="search"></span>
+              <input id="search-input" type="search" placeholder="搜索标题或内容" autocomplete="off" />
+            </label>
+            <div class="filter-tabs" role="tablist" aria-label="卡片筛选">
+              <button class="filter-tab is-active" type="button" data-filter="all">全部</button>
+              <button class="filter-tab" type="button" data-filter="new">新学</button>
+              <button class="filter-tab" type="button" data-filter="due">待复习</button>
+              <button class="filter-tab" type="button" data-filter="mastered">已掌握</button>
+            </div>
+          </div>
+
+          <div id="library-grid" class="library-grid empty-hint">还没有卡片，先添加第一张。</div>
+        </section>
+
+        <section class="view" id="view-stats" data-view-panel="stats">
+          <div class="view-header">
+            <div>
+              <p class="eyebrow">统计</p>
+              <h1>学习趋势</h1>
+              <p class="view-description">用数据看见记忆累积。</p>
+            </div>
+          </div>
+
+          <section class="stats-grid">
+            <article class="panel stats-overview">
+              <div class="stat-hero">
+                <div>
+                  <span class="stat-label">累计复习</span>
+                  <strong id="total-reviews" class="stat-number">0</strong>
+                </div>
+                <div>
+                  <span class="stat-label">记住率</span>
+                  <strong id="retention-rate" class="stat-number">0%</strong>
+                </div>
+                <div>
+                  <span class="stat-label">平均掌握度</span>
+                  <strong id="stats-mastery" class="stat-number">0%</strong>
+                </div>
+              </div>
+            </article>
+
+            <article class="panel stats-calendar-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">月历打卡</p>
+                  <h2 id="calendar-month-label">本月复习</h2>
+                </div>
+                <div class="calendar-controls" aria-label="切换统计月份">
+                  <button class="icon-button calendar-control" id="calendar-previous" type="button" aria-label="上个月" title="上个月">
+                    <span data-icon="chevron-left"></span>
+                  </button>
+                  <button class="secondary-button calendar-current-button" id="calendar-current" type="button">本月</button>
+                  <button class="icon-button calendar-control" id="calendar-next" type="button" aria-label="下个月" title="下个月">
+                    <span data-icon="chevron-right"></span>
+                  </button>
+                </div>
+              </div>
+              <div class="calendar-workspace">
+                <div class="calendar-region">
+                  <div class="calendar-weekdays" aria-hidden="true">
+                    <span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span>
+                  </div>
+                  <div id="stats-calendar" class="stats-calendar" role="grid" aria-label="按月展示的复习记录"></div>
+                </div>
+                <aside id="selected-day-details" class="selected-day-details" aria-live="polite"></aside>
+              </div>
+            </article>
+
+            <article class="panel weekly-trend-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">选中日期所在周</p>
+                  <h2>本周节奏</h2>
+                </div>
+                <span id="week-range-label" class="panel-note"></span>
+              </div>
+              <div class="week-chart" id="week-chart" aria-label="选中日期所在周的复习次数"></div>
+            </article>
+
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">评分分布</p>
+                  <h2>记忆反馈</h2>
+                </div>
+              </div>
+              <div id="rating-bars" class="rating-bars"></div>
+            </article>
+          </section>
+        </section>
+
+        <section class="view" id="view-analysis" data-view-panel="analysis">
+          <div class="view-header">
+            <div>
+              <p class="eyebrow">分析</p>
+              <h1>记忆分析</h1>
+              <p class="view-description">从复习记录中看见学习量、留存和下一次负荷。</p>
+            </div>
+          </div>
+
+          <section class="analysis-grid">
+            <article class="panel analysis-brief">
+              <div>
+                <span class="stat-label">预计明天复习</span>
+                <strong id="tomorrow-review-count" class="analysis-number">0</strong>
+                <span class="analysis-unit">张</span>
+              </div>
+              <div>
+                <span class="stat-label">预计复习时间</span>
+                <strong id="tomorrow-review-time" class="analysis-number">0 秒</strong>
+                <span class="analysis-caption">按每张卡 15 秒估算</span>
+              </div>
+            </article>
+
+            <article class="panel analysis-panel analysis-panel-wide">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">近 30 天</p>
+                  <h2>学习量</h2>
+                </div>
+                <span id="analysis-volume-note" class="panel-note"></span>
+              </div>
+              <div id="analysis-volume-chart" class="editorial-chart" aria-label="近三十天每日复习量折线图"></div>
+            </article>
+
+            <article class="panel analysis-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">滚动 7 天</p>
+                  <h2>记忆留存率</h2>
+                </div>
+                <span id="analysis-retention-note" class="panel-note"></span>
+              </div>
+              <div id="analysis-retention-chart" class="editorial-chart" aria-label="滚动七天记忆留存率曲线"></div>
+            </article>
+
+            <article class="panel analysis-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="eyebrow">明日预测</p>
+                  <h2>复习负荷</h2>
+                </div>
+                <span id="analysis-forecast-note" class="panel-note"></span>
+              </div>
+              <div id="analysis-forecast-chart" class="editorial-chart" aria-label="预计明日复习量刻度柱图"></div>
+            </article>
+          </section>
+        </section>
+
+        <section class="view" id="view-settings" data-view-panel="settings">
+          <div class="view-header">
+            <div>
+              <p class="eyebrow">设置</p>
+              <h1>学习偏好</h1>
+              <p class="view-description">调整每日目标与提醒方式。</p>
+            </div>
+          </div>
+
+          <div class="settings-layout">
+            <form class="panel settings-form" id="settings-form">
+              <div class="form-section">
+                <h2>每日目标</h2>
+                <label class="field">
+                  <span>每日新卡片</span>
+                  <input id="daily-new-cards" name="dailyNewCards" type="number" min="0" max="200" step="1" />
+                </label>
+                <label class="field">
+                  <span>目标保持率</span>
+                  <div class="range-field">
+                    <input id="desired-retention" name="desiredRetention" type="range" min="0.75" max="0.97" step="0.01" />
+                    <output id="desired-retention-value">90%</output>
+                  </div>
+                </label>
+                <label class="field">
+                  <span>每日最大复习量</span>
+                  <input id="max-reviews" name="maxReviewsPerDay" type="number" min="10" max="1000" step="10" />
+                </label>
+              </div>
+
+              <div class="form-section">
+                <h2>提醒</h2>
+                <label class="field">
+                  <span>每日提醒时间</span>
+                  <input id="reminder-time" name="reminderTime" type="time" />
+                </label>
+                <div class="field-row">
+                  <div>
+                    <strong>浏览器通知</strong>
+                    <p>在提醒时间显示系统通知。</p>
+                  </div>
+                  <button class="toggle-button" id="notification-toggle" type="button" role="switch" aria-checked="false">
+                    <span class="toggle-thumb"></span>
+                  </button>
+                </div>
+                <button class="secondary-button" id="test-notification-button" type="button">
+                  <span data-icon="bell"></span>
+                  <span>测试提醒</span>
+                </button>
+              </div>
+
+              <div class="form-section">
+                <h2>数据</h2>
+                <div class="button-row">
+                  <button class="secondary-button" id="export-data-button" type="button">
+                    <span data-icon="download"></span>
+                    <span>导出备份</span>
+                  </button>
+                  <button class="secondary-button" id="import-data-button" type="button">
+                    <span data-icon="upload"></span>
+                    <span>导入备份</span>
+                  </button>
+                  <button class="secondary-button" id="seed-knowledge-data" type="button">
+                    <span data-icon="sparkline"></span>
+                    <span>载入常识练习集</span>
+                  </button>
+                </div>
+                <input id="import-file-input" type="file" accept="application/json" hidden />
+              </div>
+
+              <div class="settings-actions">
+                <button class="primary-button" type="submit">保存设置</button>
+              </div>
+            </form>
+
+            <aside class="panel settings-note">
+              <div class="note-icon" data-icon="info"></div>
+              <h2>本地优先</h2>
+              <p>所有卡片和复习记录都保存在这台设备的浏览器中。导出备份可迁移到另一台设备，后续接入云端后也能继续使用。</p>
+            </aside>
+          </div>
+        </section>
+        </main>
+      </section>
+
+      <nav class="bottom-nav" aria-label="移动端主导航">
+        <button class="bottom-nav-item is-active" type="button" data-view="dashboard">
+          <span data-icon="dashboard"></span>
+          <span>今日</span>
+        </button>
+        <button class="bottom-nav-item" type="button" data-view="library">
+          <span data-icon="library"></span>
+          <span>资料库</span>
+        </button>
+        <button class="bottom-nav-add" id="bottom-add-button" type="button" aria-label="添加卡片">
+          <span data-icon="plus"></span>
+        </button>
+        <button class="bottom-nav-item" type="button" data-view="stats">
+          <span data-icon="chart"></span>
+          <span>统计</span>
+        </button>
+        <button class="bottom-nav-item" type="button" data-view="analysis">
+          <span data-icon="activity"></span>
+          <span>分析</span>
+        </button>
+        <button class="bottom-nav-item" type="button" data-view="settings">
+          <span data-icon="settings"></span>
+          <span>设置</span>
+        </button>
+      </nav>
+    </div>
+
+    <dialog id="card-dialog" class="modal">
+      <form id="card-form" method="dialog">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow" id="card-dialog-eyebrow">新卡片</p>
+            <h2 id="card-dialog-title">添加学习内容</h2>
+          </div>
+          <button class="icon-button" id="close-card-dialog" type="button" aria-label="关闭">
+            <span data-icon="x"></span>
+          </button>
+        </div>
+
+        <input id="card-id" type="hidden" />
+
+        <div class="form-section compact">
+          <label class="field">
+            <span>标题 / 提示</span>
+            <input id="card-title" name="title" type="text" placeholder="例如：海马体主要负责什么？" required />
+          </label>
+          <label class="field">
+            <span>答案 / 笔记</span>
+            <textarea id="card-content" name="content" rows="4" placeholder="写下你想记住的内容"></textarea>
+          </label>
+        </div>
+
+        <div class="upload-zone" id="upload-zone" tabindex="0" role="button" aria-label="上传图片">
+          <input id="image-input" type="file" accept="image/*" multiple hidden />
+          <div class="upload-preview" id="upload-preview">
+            <span class="upload-placeholder-icon" data-icon="image"></span>
+            <strong>拖入图片，或点击选择</strong>
+            <span>支持 JPG、PNG、WebP，多张图片会生成多张卡片</span>
+          </div>
+          <div class="upload-actions" id="upload-actions" hidden>
+            <button class="text-button danger" id="clear-image-button" type="button">移除图片</button>
+          </div>
+        </div>
+
+        <div class="field-row image-placement-row">
+          <div>
+            <strong>图片显示位置</strong>
+            <p>决定复习时先看图片还是答案。</p>
+          </div>
+          <select id="image-placement" name="imagePlacement">
+            <option value="front">提示面</option>
+            <option value="back">答案面</option>
+          </select>
+        </div>
+
+        <div class="modal-actions">
+          <button class="secondary-button" id="cancel-card-dialog" type="button">取消</button>
+          <button class="primary-button" type="submit">
+            <span data-icon="save"></span>
+            <span id="save-card-label">保存卡片</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="review-dialog" class="modal review-modal">
+      <div class="review-shell">
+        <div class="review-topbar">
+          <button class="icon-button" id="close-review-button" type="button" aria-label="退出复习">
+            <span data-icon="x"></span>
+          </button>
+          <div class="review-progress-track" aria-hidden="true">
+            <span id="review-progress-bar"></span>
+          </div>
+          <span id="review-count" class="review-count">0 / 0</span>
+        </div>
+
+        <div class="review-card-stage">
+          <article class="review-card" id="review-card">
+            <div class="review-card-meta">
+              <span id="review-card-type" class="badge">新卡片</span>
+              <span id="review-card-progress" class="review-card-progress"></span>
+            </div>
+            <div class="review-card-content" id="review-card-content"></div>
+            <div class="review-card-footer">
+              <span class="reveal-hint" id="reveal-hint">准备好后显示答案</span>
+            </div>
+          </article>
+        </div>
+
+        <div class="review-actions" id="review-actions">
+          <button class="review-action again" type="button" data-rating="1">
+            <span data-icon="rotate-ccw"></span>
+            <strong>忘记</strong>
+            <small>1 分钟</small>
+          </button>
+          <button class="review-action hard" type="button" data-rating="2">
+            <span data-icon="minus"></span>
+            <strong>模糊</strong>
+            <small>稍后</small>
+          </button>
+          <button class="review-action good" type="button" data-rating="3">
+            <span data-icon="check"></span>
+            <strong>记得</strong>
+            <small id="good-interval">间隔</small>
+          </button>
+          <button class="review-action easy" type="button" data-rating="4">
+            <span data-icon="zap"></span>
+            <strong>轻松</strong>
+            <small id="easy-interval">更久</small>
+          </button>
+        </div>
+
+        <button class="primary-button reveal-button" id="reveal-button" type="button">
+          <span data-icon="eye"></span>
+          <span>显示答案</span>
+        </button>
+      </div>
+    </dialog>
+
+    <dialog id="review-preview-dialog" class="modal review-preview-modal" aria-labelledby="review-preview-title">
+      <div class="modal-header">
+        <div>
+          <p class="eyebrow">当日复盘</p>
+          <h2 id="review-preview-title">复习卡片</h2>
+        </div>
+        <button class="icon-button" id="close-review-preview" type="button" aria-label="关闭复盘">
+          <span data-icon="x"></span>
+        </button>
+      </div>
+      <div class="review-preview-body">
+        <section class="review-preview-face">
+          <p class="eyebrow">问题</p>
+          <div id="review-preview-question" class="review-preview-content"></div>
+        </section>
+        <section class="review-preview-face review-preview-answer">
+          <p class="eyebrow">答案</p>
+          <div id="review-preview-answer" class="review-preview-content"></div>
+        </section>
+      </div>
+    </dialog>
+
+    <div class="toast-region" id="toast-region" aria-live="polite" aria-atomic="false"></div>
+
+    <script src="./js/icons.js"></script>
+    <script src="./js/fsrs.js"></script>
+    <script src="./js/store.js"></script>
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>
