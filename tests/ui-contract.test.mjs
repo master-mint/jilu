@@ -114,6 +114,17 @@ test("uses hover targets instead of persistent chart labels", () => {
   assert.doesNotMatch(app, /chart-peak-label/);
 });
 
+test("keeps analysis chart axes explicit and supporting type lightweight", () => {
+  assert.match(app, /chart-axis-title/);
+  assert.match(app, />日期<\/text>/);
+  assert.match(app, />复习次数<\/text>/);
+  assert.match(app, />留存率（%）<\/text>/);
+  assert.match(css, /\.chart-axis-label,[\s\S]*font-weight:\s*400/);
+  assert.match(css, /\.forecast-total\s*\{[\s\S]*font-weight:\s*600/);
+  assert.match(css, /\.forecast-duration\s*\{[\s\S]*font-weight:\s*400/);
+  assert.match(css, /\.editorial-chart svg text\s*\{[\s\S]*stroke:\s*none/);
+});
+
 test("keeps completed cards in today progress and counts each card once", async () => {
   const analytics = await import(new URL("../js/analytics-utils.mjs", import.meta.url));
   const now = new Date(2026, 7, 14, 18);
