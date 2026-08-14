@@ -938,6 +938,49 @@ h3 {
   gap: 16px;
 }
 
+.library-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.library-pagination[hidden] {
+  display: none;
+}
+
+.library-pagination-status {
+  min-width: 72px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.library-pagination-button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.library-pagination-button:hover:not(:disabled),
+.library-pagination-button:focus-visible {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.library-pagination-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.38;
+}
+
 .library-card {
   cursor: pointer;
   display: grid;
@@ -1868,16 +1911,16 @@ h3 {
   .bottom-nav {
     display: grid;
     position: fixed;
-    right: 12px;
-    bottom: calc(10px + env(safe-area-inset-bottom));
-    left: 12px;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: 40;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     align-items: center;
     min-height: var(--bottom-nav-height);
     padding: 6px;
     border: 1px solid var(--line);
-    border-radius: 20px;
+    border-radius: 0;
     background: color-mix(in srgb, var(--surface) 90%, transparent);
     box-shadow: var(--shadow-lg);
     backdrop-filter: blur(18px);
@@ -1911,7 +1954,7 @@ h3 {
   }
 
   .main-content {
-    padding-bottom: calc(118px + env(safe-area-inset-bottom));
+    padding-bottom: calc(var(--bottom-nav-height) + 24px + env(safe-area-inset-bottom));
   }
 }
 
@@ -3371,5 +3414,25 @@ select:focus-visible,
   .editorial-chart {
     min-height: 0;
     margin-top: 14px;
+  }
+}
+
+/* The mobile footer has six controls and must remain outside the reading area. */
+@media (max-width: 700px) {
+  .main-content {
+    padding-bottom: calc(var(--bottom-nav-height) + 24px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 640px) {
+  #view-library .search-box {
+    flex: 0 0 auto;
+    align-self: flex-start;
+    width: min(100%, 420px);
+    min-height: 44px;
+  }
+
+  .library-pagination {
+    justify-content: center;
   }
 }
