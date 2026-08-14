@@ -14,6 +14,7 @@ import {
   const { Icon, Store, FSRS } = window;
   const DAY_MS = 24 * 60 * 60 * 1000;
   const MINUTE_MS = 60 * 1000;
+  const LIBRARY_PAGE_SIZE = 20;
 
   const state = {
     cards: [],
@@ -22,6 +23,7 @@ import {
     currentView: "dashboard",
     currentFilter: "all",
     search: "",
+    libraryPage: 1,
     reviewSession: null,
     selectedImages: [],
     reminderTimer: null,
@@ -464,6 +466,7 @@ import {
     const query = state.search.trim().toLowerCase();
     const summary = $("#library-summary");
     const grid = $("#library-grid");
+    const pagination = $("#library-pagination");
     const total = activeUnarchivedCards().length;
     summary.textContent = `${total} 张卡片 · 平均掌握度 ${averageMastery()}%`;
 
@@ -485,11 +488,18 @@ import {
     if (!filtered.length) {
       grid.className = "library-grid empty-hint";
       grid.textContent = query ? "没有找到匹配的卡片。" : "还没有卡片，先添加第一张。";
+      pagination.hidden = true;
+      pagination.innerHTML = "";
       return;
     }
 
+    const pageCount = Math.max(1, Math.ceil(filtered.length / LIBRARY_PAGE_SIZE));
+    state.libraryPage = Math.min(state.libraryPage, pageCount);
+    const pageStart = (state.libraryPage - 1) * LIBRARY_PAGE_SIZE;
+    const pageCards = filtered.slice(pageStart, pageStart + LIBRARY_PAGE_SIZE);
+
     grid.className = "library-grid";
-    grid.innerHTML = filtered
+    grid.innerHTML = pageCards
       .map((card) => {
         const mastery = cardMastery(card);
         const isNew = card.state.reps === 0;
@@ -523,6 +533,19 @@ import {
         `;
       })
       .join("");
+
+    pagination.hidden = pageCount <= 1;
+    pagination.innerHTML = pageCount > 1
+      ? `
+        <button class="library-pagination-button" type="button" data-library-page="${state.libraryPage - 1}" aria-label="上一页" ${state.libraryPage === 1 ? "disabled" : ""}>
+          ${Icon.icon("chevron-left")}
+        </button>
+        <span class="library-pagination-status" aria-live="polite">第 ${state.libraryPage} / ${pageCount} 页</span>
+        <button class="library-pagination-button" type="button" data-library-page="${state.libraryPage + 1}" aria-label="下一页" ${state.libraryPage === pageCount ? "disabled" : ""}>
+          ${Icon.icon("chevron-right")}
+        </button>
+      `
+      : "";
   }
 
   function renderStats() {
@@ -1313,14 +1336,24 @@ import {
 
     $("#search-input").addEventListener("input", (event) => {
       state.search = event.target.value;
+      state.libraryPage = 1;
       renderLibrary();
     });
     $$(".filter-tab").forEach((button) => {
       button.addEventListener("click", () => {
         state.currentFilter = button.dataset.filter;
+        state.libraryPage = 1;
         $$(".filter-tab").forEach((tab) => tab.classList.toggle("is-active", tab === button));
         renderLibrary();
       });
+    });
+
+    $("#library-pagination").addEventListener("click", (event) => {
+      const button = event.target.closest("[data-library-page]");
+      if (!button || button.disabled) return;
+      state.libraryPage = Number(button.dataset.libraryPage);
+      renderLibrary();
+      $("#library-grid").scrollIntoView({ block: "start", behavior: "smooth" });
     });
 
     $("#calendar-previous").addEventListener("click", () => {
